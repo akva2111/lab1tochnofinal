@@ -2,7 +2,6 @@
 #include <iostream>    
 #include <limits> 
 #include <random>
-#include <algorithm> 
 #include <chrono> 
 #include <iomanip>
 #include <sstream>
@@ -70,6 +69,43 @@ int calculatePathCost(const CostMatrix& matrix, const Path& path) {
     }
     return totalCost;
 }
+bool nextPermutationDijkstra(std::vector<int>& p) {
+    int n = p.size();
+    // 1. find max i for, 0 < i < n и P[i] < P[i+1].
+    int i = -1;
+    for (int k = n - 2; k >= 0; --k) {
+        if (p[k] < p[k + 1]) {
+            i = k;
+            break;
+        }
+    }
+
+    if (i == -1) {
+        return false; // Следующей перестановки нет
+    }
+
+    // 2. find max j for ,i < j <= n and P[i] < P[j].
+    int j = -1;
+    for (int k = n - 1; k > i; --k) {
+        if (p[i] < p[k]) {
+            j = k;
+            break;
+        }
+    }
+
+    // 3. swap P[i] and P[j].
+    std::swap(p[i], p[j]);
+    //4
+    int left = i + 1;
+    int right = n - 1;
+    while (left < right) {
+        std::swap(p[left], p[right]);
+        left++;
+        right--;
+    }
+
+    return true;
+}
 //Tsp
 TspSolution solveTspBruteForce(const CostMatrix& matrix, int startCity) {
     int numCities = matrix.size();
@@ -112,7 +148,7 @@ TspSolution solveTspBruteForce(const CostMatrix& matrix, int startCity) {
             solution.minCost = currentCost;
             solution.bestPath = currentPath;
         }
-    } while (std::next_permutation(citiesToPermute.begin(), citiesToPermute.end()));
+    } while (nextPermutationDijkstra(citiesToPermute));
     if (solution.minCost == INF) {
         std::cerr << "[solveTspBruteForce115] danger!! all path INF." << std::endl;
     }
