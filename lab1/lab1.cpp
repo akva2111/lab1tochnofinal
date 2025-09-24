@@ -157,7 +157,9 @@ TspSolution solveTspBruteForce(const CostMatrix& matrix, int startCity) {
 
 void main() {
 
-    int numCities, startCity, maxCost;
+    int numCities, startCity, maxCost,runer;
+    std::cout << "input how much runer: ";
+    std::cin >> runer;
     // how much City
     std::cout << "input how much City: ";
     std::cin >> numCities;
@@ -165,14 +167,13 @@ void main() {
         std::cerr << "Eror: City must be>0, try again: ";
         std::cin >> numCities;
     }
-
-    // start sity
     std::cout << "input start town (from 0 to " << numCities - 1 << "): ";
     std::cin >> startCity;
     while (startCity < 0 || startCity >= numCities) {
         std::cerr << "Eror: not corect number start Town: ";
         std::cin >> startCity;
     }
+    
     // input Max price
     std::cout << "input Max price: ";
     std::cin >> maxCost;
@@ -184,32 +185,42 @@ void main() {
     // --- start ---
     CostMatrix demoMatrix;
     fillRandomMatrix(demoMatrix, numCities, maxCost, startCity);
+    for (int step = 0;step <runer;step++) {
+        std::cout << "\n--- solve ---" << std::endl;
+        std::cout << "Number of cities: " << numCities << std::endl;
+        std::cout << "start citi: " << startCity << std::endl;
+        std::cout << "max price: " << maxCost << std::endl;
 
-    std::cout << "\n--- solve ---" << std::endl;
-    std::cout << "Number of cities: " << numCities << std::endl;
-    std::cout << "start citi: " << startCity << std::endl;
-    std::cout << "max price: " << maxCost << std::endl;
+        std::cout << "\nMatrix price:" << std::endl;
+        for (int i = 0; i < numCities; ++i) {
+            for (int j = 0; j < numCities; ++j) {
+                if (demoMatrix[i][j] == INF) std::cout << " INF ";
+                else std::cout << std::setw(4) << demoMatrix[i][j] << " ";
+            }
+            std::cout << std::endl;
+        }
 
-    std::cout << "\nMatrix price:" << std::endl;
-    for (int i = 0; i < numCities; ++i) {
-        for (int j = 0; j < numCities; ++j) {
-            if (demoMatrix[i][j] == INF) std::cout << " INF ";
-            else std::cout << std::setw(4) << demoMatrix[i][j] << " ";
+        auto demoStartTime = std::chrono::high_resolution_clock::now();
+        TspSolution demoSolution = solveTspBruteForce(demoMatrix, startCity);
+        auto demoEndTime = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> demoElapsed = demoEndTime - demoStartTime;
+
+        std::cout << "\nresult:" << std::endl;
+        std::cout << "  min price: " << (demoSolution.minCost == INF ? "INF" : intToString(demoSolution.minCost)) << std::endl;
+        std::cout << "  Best Path: ";
+        for (size_t i = 0; i < demoSolution.bestPath.size(); ++i) {
+            std::cout << demoSolution.bestPath[i] << (i == demoSolution.bestPath.size() - 1 ? "" : " -> ");
         }
         std::cout << std::endl;
+        std::cout << "  time: " << demoElapsed.count() << " sec." << std::endl;
+        //new start sity
+        if (step + 1 < runer) {
+            std::cout << "input new start town (from 0 to " << numCities - 1 << "): ";
+            std::cin >> startCity;
+            while (startCity < 0 || startCity >= numCities) {
+                std::cerr << "Eror: not corect number start Town: ";
+                std::cin >> startCity;
+            }
+        }
     }
-
-    auto demoStartTime = std::chrono::high_resolution_clock::now();
-    TspSolution demoSolution = solveTspBruteForce(demoMatrix, startCity);
-    auto demoEndTime = std::chrono::high_resolution_clock::now();
-    std::chrono::duration<double> demoElapsed = demoEndTime - demoStartTime;
-
-    std::cout << "\nresult:" << std::endl;
-    std::cout << "  min price: " << (demoSolution.minCost == INF ? "INF" : intToString(demoSolution.minCost)) << std::endl;
-    std::cout << "  Best Path: ";
-    for (size_t i = 0; i < demoSolution.bestPath.size(); ++i) {
-        std::cout << demoSolution.bestPath[i] << (i == demoSolution.bestPath.size() - 1 ? "" : " -> ");
-    }
-    std::cout << std::endl;
-    std::cout << "  time: " << demoElapsed.count() << " sec." << std::endl;
 }
