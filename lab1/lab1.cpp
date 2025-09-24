@@ -81,7 +81,7 @@ bool nextPermutationDijkstra(std::vector<int>& p) {
     }
 
     if (i == -1) {
-        return false; // Следующей перестановки нет
+        return false; // next permut
     }
 
     // 2. find max j for ,i < j <= n and P[i] < P[j].
